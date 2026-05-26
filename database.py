@@ -372,7 +372,7 @@ class DatabaseManager:
                 conn.commit()
         except Exception as e:
             logger.error(f"Error updating user memory: {e}")
-mory: {e}")
+
 
     # --- Levels ---
     def get_levels(self, guild_id=None):
