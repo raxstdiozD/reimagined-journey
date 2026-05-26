@@ -37,6 +37,14 @@ const Dashboard = {
                 this.fetchSystemStats();
                 document.body.classList.add('authenticated');
                 document.body.classList.remove('loading');
+                
+                // Show modal to new users to choose notification channel preference
+                if (this.user.is_new_user) {
+                    setTimeout(() => {
+                        const modal = document.getElementById('preferenceModal');
+                        if (modal) modal.classList.add('active');
+                    }, 800);
+                }
                 return;
             }
         } catch (e) {
@@ -379,3 +387,34 @@ async function executeTerminalCommand() {
 
 function closeSuggestModal() { document.getElementById('aiSuggestModal').classList.remove('active'); }
 function closeModal() { document.getElementById('configModal').classList.remove('active'); }
+
+async function saveSignupPreference() {
+    const selected = document.querySelector('input[name="notif_pref"]:checked');
+    if (!selected) return alert("Select a preference option.");
+    
+    const val = selected.value;
+    const btn = document.getElementById('btnPrefSave');
+    btn.textContent = "SAVING CONFIGURATION...";
+    btn.disabled = true;
+    
+    try {
+        const res = await fetch('/api/user/preference', {
+            method: 'POST',
+            body: JSON.stringify({ preference: val }),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Session-Token': Dashboard.token
+            }
+        });
+        if (res.ok) {
+            document.getElementById('preferenceModal').classList.remove('active');
+        } else {
+            alert("Could not update preference. Please try again.");
+        }
+    } catch (e) {
+        alert("Network error. Please try again.");
+    }
+    btn.textContent = "SAVE PREFERENCES";
+    btn.disabled = false;
+}
+

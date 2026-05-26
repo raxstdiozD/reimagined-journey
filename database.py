@@ -116,11 +116,23 @@ class DatabaseManager:
                     vibe TEXT,
                     notes TEXT,
                     interaction_count INTEGER DEFAULT 0,
+                    notification_preference TEXT DEFAULT 'email',
                     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
 
+            # Migration: Ensure notification_preference column exists
+            try:
+                cursor.execute('ALTER TABLE user_memory ADD COLUMN IF NOT EXISTS notification_preference TEXT DEFAULT \'email\'')
+                if not self.is_postgres:
+                    try: cursor.execute('ALTER TABLE user_memory ADD COLUMN notification_preference TEXT DEFAULT \'email\'')
+                    except: pass
+                conn.commit()
+            except Exception as e:
+                pass
+
             # Table for Levels
+
             create_table('''
                 CREATE TABLE IF NOT EXISTS user_levels (
                     guild_id BIGINT,
@@ -290,12 +302,12 @@ class DatabaseManager:
             with self.get_connection() as conn:
                 with self.get_cursor(conn) as cursor:
                     cursor.execute(
-                        f'SELECT profile_summary, vibe, interaction_count FROM user_memory WHERE user_id = {p}',
+                        f'SELECT profile_summary, vibe, interaction_count, notification_preference FROM user_memory WHERE user_id = {p}',
                         (int(user_id),)
                     )
                     row = cursor.fetchone()
                     if row:
-                        res = {"profile_summary": row[0], "vibe": row[1], "interaction_count": row[2]}
+                        res = {"profile_summary": row[0], "vibe": row[1], "interaction_count": row[2], "notification_preference": row[3] or 'email'}
                         self._user_memory_cache[int(user_id)] = res
                         return res
                     return None
@@ -303,7 +315,22 @@ class DatabaseManager:
             logger.error(f"Error getting user memory from DB: {e}")
             return None
 
-    def update_user_memory(self, user_id, username, profile_summary=None, vibe=None, notes=None):
+    def set_user_notification_preference(self, user_id, preference):
+        p = self.get_placeholder()
+        try:
+            if int(user_id) in self._user_memory_cache:
+                del self._user_memory_cache[int(user_id)]
+            with self.get_connection() as conn:
+                with self.get_cursor(conn) as cursor:
+                    cursor.execute(
+                        f'UPDATE user_memory SET notification_preference = {p} WHERE user_id = {p}',
+                        (preference, int(user_id))
+                    )
+                conn.commit()
+        except Exception as e:
+            logger.error(f"Error setting notification preference: {e}")
+
+    def update_user_memory(self, user_id, username, profile_summary=None, vibe=None, notes=None, notification_preference=None):
         p = self.get_placeholder()
         try:
             # Clear cache on update
@@ -330,18 +357,22 @@ class DatabaseManager:
                         if notes is not None: 
                             updates.append(f"notes = {p}")
                             params.append(notes)
+                        if notification_preference is not None:
+                            updates.append(f"notification_preference = {p}")
+                            params.append(notification_preference)
                         params.append(user_id)
                         
                         cursor.execute(f"UPDATE user_memory SET {', '.join(updates)} WHERE user_id = {p}", params)
                     else:
                         cursor.execute(
-                            f'''INSERT INTO user_memory (user_id, username, profile_summary, vibe, notes, interaction_count) 
-                               VALUES ({p}, {p}, {p}, {p}, {p}, 1)''',
-                            (user_id, username, profile_summary or "New user", vibe or "neutral", notes or "")
+                            f'''INSERT INTO user_memory (user_id, username, profile_summary, vibe, notes, interaction_count, notification_preference) 
+                               VALUES ({p}, {p}, {p}, {p}, {p}, 1, {p})''',
+                            (user_id, username, profile_summary or "New user", vibe or "neutral", notes or "", notification_preference or "email")
                         )
                 conn.commit()
         except Exception as e:
             logger.error(f"Error updating user memory: {e}")
+mory: {e}")
 
     # --- Levels ---
     def get_levels(self, guild_id=None):

@@ -131,9 +131,23 @@ async def callback(code: str = None):
         user_info = user_res.json()
         guilds = guilds_res.json()
         
+        user_id = int(user_info["id"])
+        
+        # Check if user already exists
+        mem = db_manager.get_user_memory(user_id)
+        is_new_user = False
+        if not mem:
+            is_new_user = True
+            db_manager.update_user_memory(user_id, user_info["username"], profile_summary="Authenticated user via web dashboard", vibe="neutral")
+            
         session_token = str(uuid.uuid4())
         SESSIONS[session_token] = {
-            "user": {"id": user_info["id"], "name": user_info["username"], "avatar": user_info.get("avatar")},
+            "user": {
+                "id": user_info["id"], 
+                "name": user_info["username"], 
+                "avatar": user_info.get("avatar"),
+                "is_new_user": is_new_user
+            },
             "guilds": guilds
         }
         return RedirectResponse(url=f"/dashboard/index.html?session_token={session_token}")
@@ -155,6 +169,65 @@ async def api_me(request: Request):
         enriched_guilds.append(g_copy)
     
     return {"authenticated": True, "user": data["user"], "guilds": enriched_guilds}
+
+@app.post("/api/user/preference")
+async def save_user_preference(request: Request):
+    token = request.headers.get("X-Session-Token")
+    if not token or token not in SESSIONS: return JSONResponse({"error": "Unauthorized"}, status_code=401)
+    
+    data = await request.json()
+    pref = data.get("preference", "email") # 'email', 'discord', 'both'
+    user_id = int(SESSIONS[token]["user"]["id"])
+    username = SESSIONS[token]["user"]["name"]
+    
+    # Save choice in database
+    db_manager.set_user_notification_preference(user_id, pref)
+    
+    # 3. Welcome Message Dispatching
+    # If user chooses Discord DM or Both, send welcome message via the bot
+    if pref in ["discord", "both"]:
+        asyncio.create_task(send_bot_dm_welcome(user_id, username))
+    
+    # If user chooses Email or Both, send via email (mocking Resend / printing log for backward compatibility)
+    if pref in ["email", "both"]:
+        logger.info(f"📧 Resend API Triggered: Welcoming {username} ({user_id}) via Email.")
+        
+    return {"status": "success"}
+
+async def send_bot_dm_welcome(user_id: int, username: str):
+    """Sends a premium direct message welcome using Discord API Bot authorization."""
+    try:
+        async with httpx.AsyncClient() as client:
+            headers = {"Authorization": f"Bot {BOT_TOKEN}", "Content-Type": "application/json"}
+            # 1. Create DM channel
+            dm_channel_res = await client.post(
+                "https://discord.com/api/v10/users/@me/channels",
+                headers=headers,
+                json={"recipient_id": str(user_id)}
+            )
+            if dm_channel_res.status_code == 200:
+                channel_id = dm_channel_res.json()["id"]
+                # 2. Send welcome embed
+                embed = {
+                    "title": "🌌 WELCOME TO LUMORA",
+                    "description": (
+                        f"Hey **{username}**! Welcome to the squad.\n\n"
+                        "We've updated your settings successfully. You will receive real-time notifications & OTPs right here in your DMs!\n\n"
+                        "💡 *Need help configuring your servers? Type `!help` or head over to the web dashboard.*"
+                    ),
+                    "color": 65450, # Lumora vibe color (cyanish-green)
+                    "footer": {"text": "Lumora AI • Creative Engineering"}
+                }
+                await client.post(
+                    f"https://discord.com/api/v10/channels/{channel_id}/messages",
+                    headers=headers,
+                    json={"embeds": [embed]}
+                )
+                logger.info(f"✨ Welcome DM successfully delivered to user {user_id}")
+            else:
+                logger.error(f"❌ Failed to open DM channel with user {user_id}: {dm_channel_res.text}")
+    except Exception as e:
+        logger.error(f"❌ Failed to dispatch DM welcome to user {user_id}: {e}")
 
 @app.get("/api/dashboard/stats")
 async def dash_stats(request: Request):
