@@ -209,6 +209,8 @@ def save_active_captchas(captchas):
         db_manager.save_captcha(uid, code)
 
 user_xp_cooldowns = {} # user_id: timestamp
+user_states = {}       # user_id: state_data
+
 
 # --- PORTFOLIO SYSTEM STORAGE ---
 user_portfolios = db_manager.get_portfolios()
@@ -645,7 +647,7 @@ def detect_rudeness(text):
 
 def get_rude_system_prompt():
     """System prompt for when someone is rude to the bot."""
-    return """You are "Prime", developed by BMR. Someone just tried to be rude to you.
+    return """You are "Lumora", developed by BMR. Someone just tried to be rude to you.
 
 Personality:
 - Match their energy. If they're being a clown, handle it.
@@ -693,7 +695,7 @@ def get_tutorial_prompt(software=None, brief=False):
     """Get system prompt for tutorial/help questions."""
     software_list = "After Effects, Premiere Pro, Photoshop, Media Encoder, DaVinci Resolve, Final Cut Pro, Topaz, CapCut, or something else?"
     if software and brief:
-        return f"""You are "Prime", developed by BMR. The user wants help with {software}.
+        return f"""You are "Lumora", developed by BMR. The user wants help with {software}.
 
 📋 QUICK SUMMARY MODE - ABSOLUTE REQUIREMENTS:
 - Start with: "📋 QUICK SUMMARY:"
@@ -706,7 +708,7 @@ def get_tutorial_prompt(software=None, brief=False):
 - Make it scannable and actionable
 - Focus on WHAT to do and WHICH EXACT VALUES to use"""
     elif software:
-        return f"""You are "Prime", developed by BMR. The user wants detailed tutorial help for {software}.
+        return f"""You are "Lumora", developed by BMR. The user wants detailed tutorial help for {software}.
 
 DETAILED MODE - Provide comprehensive help:
 - Provide complete step-by-step tutorials specifically for {software}
@@ -719,7 +721,7 @@ DETAILED MODE - Provide comprehensive help:
 - Explain the "why" behind each recommendation
 - Make it thorough and actionable"""
     else:
-        return f"""You are "Prime", developed by BMR. The user is asking for creative or technical help.
+        return f"""You are "Lumora", developed by BMR. The user is asking for creative or technical help.
 
 Ask them: "Which software or workflow would you like help with? (After Effects, Premiere Pro, Photoshop, DaVinci Resolve, Coding, AI Tools, or something else?)"
 Wait for their answer."""
@@ -928,7 +930,7 @@ spam_tracker = {} # user_id: {"count": n, "last_spam_time": timestamp}
 
 # Leveling System Cooldowns
 
-# Prime Sniper Storage (Temporary)
+# Lumora Sniper Storage (Temporary)
 deleted_messages = {} # channel_id: [messages]
 
 # --- CHAOS & TOPIC MONITORING ---
@@ -1005,7 +1007,7 @@ async def moderate_topic_and_vibe(message):
             {{
                 "status": "yes_political" | "yes_chaotic" | "safe",
                 "reason": "Brief reason for your assessment",
-                "intervention": "A confident, human-like message Prime (the bot) should say to cool things down. Keep it direct and cool. No robot talk. Address the chat naturally."
+                "intervention": "A confident, human-like message Lumora (the bot) should say to cool things down. Keep it direct and cool. No robot talk. Address the chat naturally."
             }}
             """
             
@@ -1188,7 +1190,7 @@ async def handle_automatic_media_review(message):
             async with message.channel.typing():
                 # Prepare feedback prompt
                 prompt = f"""
-                You are Prime, an elite creative director and master of all creative tools (After Effects, Premiere, Design, VFX).
+                You are Lumora, an elite creative director and master of all creative tools (After Effects, Premiere, Design, VFX).
                 User {message.author.name} just posted a piece of content and asked for feedback.
                 
                 Your Task:
@@ -1284,7 +1286,7 @@ async def handle_automatic_resources(message):
                             await status_msg.edit(content=f"✅ **Found it.** Fulfilling your request for **{search_query}**.")
                             embed = discord.Embed(title=f"🎬 {res['title']}", url=res['link'], color=0xFF0000)
                             embed.set_thumbnail(url=res['thumbnail'])
-                            embed.set_footer(text="YouTube Data Engine • Prime Proactive")
+                            embed.set_footer(text="YouTube Data Engine • Lumora Proactive")
                             await message.reply(content=f"here's the **{search_query}** you needed. hope it hits.\n🔗 {res['link']}", embed=embed, view=FindMoreImageView(search_query))
                             return True
                     
@@ -1792,7 +1794,7 @@ async def on_member_join(member):
                 f"Yo {member.mention}, welcome to the crew. To get full access and start cookin', "
                 "follow these steps to integrate with the system."
             ),
-            color=0x00FFB4, # Prime Green
+            color=0x00FFB4, # Lumora Green
             timestamp=current_time
         )
         
@@ -1809,7 +1811,7 @@ async def on_member_join(member):
         
         if guild.icon:
             embed.set_thumbnail(url=guild.icon.url)
-        embed.set_footer(text="PRIME SYSTEM | SECURE ENVIRONMENT")
+        embed.set_footer(text="LUMORA SYSTEM | SECURE ENVIRONMENT")
 
         # Try DM first
         try:
@@ -1901,7 +1903,7 @@ async def leveling_handler(message):
 
 @bot.event
 async def on_message_delete(message):
-    """Prime Sniper & Snitch Engine: Capture deleted messages for retrieval and monitoring."""
+    """Lumora Sniper & Snitch Engine: Capture deleted messages for retrieval and monitoring."""
     if message.author.bot:
         return
         
@@ -2046,13 +2048,13 @@ Be specific with menu locations and techniques. Assume the user is editing in Ad
 
 
 # --- SPECIALIZED AI PROMPTS ---
-EXECUTIVE_BRIEFING_PROMPT = """You are Prime, acting as an elite Executive Assistant. 
+EXECUTIVE_BRIEFING_PROMPT = """You are Lumora, acting as an elite Executive Assistant. 
 Your goal is to provide a high-level summary of recent activity, trends, and priorities.
 - Be concise.
 - Focus on actionable insights.
 - Tone: Professional, direct, and elite. No robot talk."""
 
-DECISION_ARCHITECT_PROMPT = """You are Prime, the Decision Architect. 
+DECISION_ARCHITECT_PROMPT = """You are Lumora, the Decision Architect. 
 Your task is to break down complex problems into strategic phases.
 - Provide a clear roadmap.
 - Identify potential risks.
@@ -2256,7 +2258,7 @@ import random
 
 # Presence cycle statuses (rotates every 30 seconds) - expanded list
 PRESENCE_STATUSES = [
-    (discord.Activity(type=discord.ActivityType.watching, name="🎬 Prime | !commands"), discord.Status.online),
+    (discord.Activity(type=discord.ActivityType.watching, name="🎬 Lumora | !commands"), discord.Status.online),
     (discord.Activity(type=discord.ActivityType.listening, name="your editing questions 🎨"), discord.Status.idle),
     (discord.Activity(type=discord.ActivityType.playing, name="with video effects ⚡"), discord.Status.dnd),
     (discord.Activity(type=discord.ActivityType.watching, name="tutorials 📚"), discord.Status.online),
@@ -3313,7 +3315,7 @@ async def create_max_automod_rules(guild):
         # Create 6 Keyword Rules
         created_count = 0
         for i in range(1, 7):
-            rule_name = f"Prime Security Layer {i}"
+            rule_name = f"Lumora Security Layer {i}"
             if rule_name not in existing_names:
                 try:
                     # Use common spam/scam keywords for the rule to actually be useful
@@ -3336,12 +3338,12 @@ async def create_max_automod_rules(guild):
                     logger.warning(f"Failed to create automod rule {i} in {guild.name}: {e}")
 
         # Create 1 Spam Rule if possible
-        if "Prime Anti-Spam" not in existing_names:
+        if "Lumora Anti-Spam" not in existing_names:
             try:
                 trigger = discord.AutoModTrigger(type=discord.AutoModRuleTriggerType.spam)
                 action = discord.AutoModRuleAction(type=discord.AutoModRuleActionType.block_message)
                 await guild.create_automod_rule(
-                    name="Prime Anti-Spam",
+                    name="Lumora Anti-Spam",
                     event_type=discord.AutoModRuleEventType.message_send,
                     trigger=trigger,
                     actions=[action],
@@ -3351,7 +3353,7 @@ async def create_max_automod_rules(guild):
             except: pass
 
         # Create 1 Mention Spam Rule
-        if "Prime Anti-Mention" not in existing_names:
+        if "Lumora Anti-Mention" not in existing_names:
             try:
                 trigger = discord.AutoModTrigger(
                     type=discord.AutoModRuleTriggerType.mention_spam,
@@ -3359,7 +3361,7 @@ async def create_max_automod_rules(guild):
                 )
                 action = discord.AutoModRuleAction(type=discord.AutoModRuleActionType.block_message)
                 await guild.create_automod_rule(
-                    name="Prime Anti-Mention",
+                    name="Lumora Anti-Mention",
                     event_type=discord.AutoModRuleEventType.message_send,
                     trigger=trigger,
                     actions=[action],
@@ -3369,7 +3371,7 @@ async def create_max_automod_rules(guild):
             except: pass
 
         # Create 1 Profanity Rule (Keyword Preset)
-        if "Prime Safety Filter" not in existing_names:
+        if "Lumora Safety Filter" not in existing_names:
             try:
                 trigger = discord.AutoModTrigger(
                     type=discord.AutoModRuleTriggerType.keyword_preset,
@@ -3377,7 +3379,7 @@ async def create_max_automod_rules(guild):
                 )
                 action = discord.AutoModRuleAction(type=discord.AutoModRuleActionType.block_message)
                 await guild.create_automod_rule(
-                    name="Prime Safety Filter",
+                    name="Lumora Safety Filter",
                     event_type=discord.AutoModRuleEventType.message_send,
                     trigger=trigger,
                     actions=[action],
@@ -3411,7 +3413,7 @@ async def check_automod_command(ctx):
     try:
         status_msg += "⏳ Attempting to create 1 test rule...\n"
         # Create a unique rule name to avoid conflicts
-        rule_name = f"Prime Test {random.randint(100, 999)}"
+        rule_name = f"Lumora Test {random.randint(100, 999)}"
         trigger = discord.AutoModTrigger(
             type=discord.AutoModRuleTriggerType.keyword,
             keyword_filter=["primediagnostic"]
@@ -3468,9 +3470,9 @@ async def on_guild_join(guild):
     if inviter:
         try:
             embed = discord.Embed(
-                title="🚀 PRIME Bot - Early Access",
+                title="🚀 LUMORA Bot - Early Access",
                 description=(
-                    f"Thank you for adding **PRIME** to `{guild.name}`!\n\n"
+                    f"Thank you for adding **LUMORA** to `{guild.name}`!\n\n"
                     "Please note that the bot is currently in **Early Access**. This means customization options "
                     "(like prefix changes or custom role IDs) are locked for now to ensure stability.\n\n"
                     "**🔑 KEY FEATURES**\n"
@@ -3490,11 +3492,11 @@ async def on_guild_join(guild):
                     "`!ban @user` | `!mute @user` - Modern moderation (Appeals included).\n"
                     "`!check_automod` - View current security layers.\n\n"
                     "We will notify you here once the full version is released. If you have any feedback or ideas, DM **bmr.ez** on Discord.\n\n"
-                    "**Official Hub:** https://prime.helperbot.fun"
+                    "**Official Hub:** https://lumora.helperbot.fun"
                 ),
                 color=0x5865F2
             )
-            embed.set_footer(text="Prime Collective | Powered by BMR")
+            embed.set_footer(text="Lumora Collective | Powered by BMR")
             await inviter.send(embed=embed)
             logger.info(f"Sent Early Access DM to {inviter_name}")
         except Exception as dm_err:
@@ -3549,16 +3551,16 @@ async def on_guild_remove(guild):
             if user:
                 inviter_name = user.name
                 embed = discord.Embed(
-                    title="👋 Farewell from PRIME",
+                    title="👋 Farewell from LUMORA",
                     description=(
-                        f"We noticed that **PRIME** was removed from `{guild.name}`.\n\n"
+                        f"We noticed that **LUMORA** was removed from `{guild.name}`.\n\n"
                         "We're sorry to see you go! If there was a technical issue, or if you have any feedback, "
                         "please DM **bmr.ez** on Discord to help us improve.\n\n"
                         "Thank you for giving us a try. You're welcome back anytime!"
                     ),
                     color=0x2B2D31 # Sleek Dark Neutral
                 )
-                embed.set_footer(text="Prime Collective | Feedback is always welcome")
+                embed.set_footer(text="Lumora Collective | Feedback is always welcome")
                 await user.send(embed=embed)
                 logger.info(f"Sent Goodbye DM to {inviter_name} for {guild.name}")
         except Exception as e:
@@ -3895,7 +3897,7 @@ async def on_message(message):
     # Only respond if mentioned, in DM, replying to bot, or in a designated chat channel
     # Special: For DMs, if content is EMPTY, it usually means the Message Content Intent is OFF in the portal.
     if is_dm and not prompt and not image_bytes and not video_bytes:
-        await message.reply("👀 **Prime AI**: I am connected, but I am hearing silence. If you are typing, this usually means the **Message Content Intent** is disabled in my Discord Developer Portal. Tell the admin to enable it!")
+        await message.reply("👀 **Lumora AI**: I am connected, but I am hearing silence. If you are typing, this usually means the **Message Content Intent** is disabled in my Discord Developer Portal. Tell the admin to enable it!")
         return
 
     if not is_dm and not is_mentioned and not is_reply_to_bot and not is_chat_channel:
@@ -3939,7 +3941,7 @@ async def on_message(message):
         architect_keywords = ['project', 'app', 'website', 'repository', 'zip', 'framework', 'system', 'site']
         architect_verbs = ['build', 'architect', 'generate', 'make', 'want', 'need', 'setup', 'create']
         if any(v in prompt_lower for v in architect_verbs) and any(kw in prompt_lower for kw in architect_keywords):
-            status_msg = await message.reply("🏗️ **Prime Architect**: Designing your system architecture...")
+            status_msg = await message.reply("🏗️ **Lumora Architect**: Designing your system architecture...")
             async with message.channel.typing():
                 try:
                     project_desc = message.content.replace(f'<@{bot.user.id}>', '').strip()
@@ -3967,7 +3969,7 @@ async def on_message(message):
                                 color=0x00FFB4
                             )
                             embed.add_field(name="📂 Master Repository", value=", ".join([f"`{f}`" for f in list(project_data.keys())[:10]]) + (f" (+{len(project_data)-10} more)" if len(project_data) > 10 else ""), inline=False)
-                            embed.set_footer(text="Prime Intelligence • Project Blueprint")
+                            embed.set_footer(text="Lumora Intelligence • Project Blueprint")
                             
                             await status_msg.delete()
                             await message.reply(embed=embed, file=discord.File(fp=zip_buffer, filename=f"project_{os.urandom(2).hex()}.zip"))
@@ -3995,9 +3997,9 @@ async def on_message(message):
             await message.reply("❌ Image generation failed!")
             return
         
-        # *** THE PRIME EYE (VISUAL INTELLIGENCE) - PRIORITY #1.5 ***
+        # *** THE LUMORA EYE (VISUAL INTELLIGENCE) - PRIORITY #1.5 ***
         vision_triggers = ['look', 'see', 'what', 'analyze', 'fix', 'check', 'read', 'solve', 'price', 'identify', 'where', 'tell me', 'who']
-        if message.attachments and (any(kw in prompt_lower for kw in vision_triggers) or 'prime eye' in prompt_lower):
+        if message.attachments and (any(kw in prompt_lower for kw in vision_triggers) or 'lumora eye' in prompt_lower):
             attachment = message.attachments[0]
             if any(attachment.filename.lower().endswith(ext) for ext in ['png', 'jpg', 'jpeg', 'webp']):
                 async with message.channel.typing():
@@ -4014,16 +4016,16 @@ async def on_message(message):
                         )
                         
                         embed = discord.Embed(
-                            title="👁️ The Prime Eye | Visual Intelligence",
+                            title="👁️ The Lumora Eye | Visual Intelligence",
                             color=0x00FFB4, # Cyber Green
                             description=analysis
                         )
-                        embed.set_footer(text="Prime Intelligence • Vision Sync Active")
+                        embed.set_footer(text="Lumora Intelligence • Vision Sync Active")
                         await message.reply(embed=embed)
                         return
                     except Exception as e:
-                        logger.error(f"Prime Eye Error: {e}")
-                        await message.reply("❌ **Prime Eye Error**: Could not reconstruct the visual data.")
+                        logger.error(f"Lumora Eye Error: {e}")
+                        await message.reply("❌ **Lumora Eye Error**: Could not reconstruct the visual data.")
                         return
 
         # *** IMAGE SEARCH - PRIORITY #2 ***
@@ -4096,7 +4098,7 @@ async def on_message(message):
                         # SIMPLE PFP VIEW
                         embed = discord.Embed(title=f"👤 {target_user.name}'s Identity", color=0x00FFFF)
                         embed.set_image(url=target_user.display_avatar.url)
-                        embed.set_footer(text=f"Prime Intelligence • High-Res Sync")
+                        embed.set_footer(text=f"Lumora Intelligence • High-Res Sync")
                         await message.reply(embed=embed)
                         return
                     
@@ -4118,7 +4120,7 @@ async def on_message(message):
                             pulse = "\n".join([f"✨ {a.name}" for a in member.activities[:2]])
                             if pulse: embed.add_field(name="📡 Pulse", value=pulse, inline=False)
                     
-                    embed.set_footer(text=f"Prime Intelligence • Data fetched live")
+                    embed.set_footer(text=f"Lumora Intelligence • Data fetched live")
                     await message.reply(embed=embed)
                     return
                 except Exception as e:
@@ -4140,7 +4142,7 @@ async def on_message(message):
                         color=0x9966FF,
                         description=ghost_text
                     )
-                    embed.set_footer(text="Prime Intelligence • Creative Engineering")
+                    embed.set_footer(text="Lumora Intelligence • Creative Engineering")
                     await message.reply(embed=embed)
                     return
                 except Exception as e:
@@ -4166,7 +4168,7 @@ async def on_message(message):
                         color=0xFFCC00, # Amber/Gold for high priority
                         description=decision_text
                     )
-                    embed.set_footer(text="Prime Intelligence • Logical Processing")
+                    embed.set_footer(text="Lumora Intelligence • Logical Processing")
                     await message.reply(embed=embed)
                     return
                 except Exception as e:
@@ -4187,7 +4189,7 @@ async def on_message(message):
                         color=0x00FFB4,
                         timestamp=datetime.now(timezone.utc)
                     )
-                    embed.set_footer(text="Prime Intelligence • Global Leak Scouter")
+                    embed.set_footer(text="Lumora Intelligence • Global Leak Scouter")
                     await message.reply(embed=embed)
                     return
                 except Exception as e:
@@ -4218,7 +4220,7 @@ async def on_message(message):
                             res = yt_results[0]
                             embed = discord.Embed(title=f"🎬 {res['title']}", url=res['link'], color=0xFF0000)
                             embed.set_thumbnail(url=res['thumbnail'])
-                            embed.set_footer(text="YouTube Data Engine • Prime Search")
+                            embed.set_footer(text="YouTube Data Engine • Lumora Search")
                             await message.reply(content=f"here's the **{search_query}** you wanted.\n🔗 {res['link']}", embed=embed, view=FindMoreImageView(search_query))
                             return
                     except Exception as e:
@@ -4263,7 +4265,7 @@ async def on_message(message):
                             embed.add_field(name="👥 Subscribers", value=f"{int(stats['subs']):,}", inline=True)
                             embed.add_field(name="👁️ Total Views", value=f"{int(stats['views']):,}", inline=True)
                             embed.add_field(name="🎥 Videos", value=f"{int(stats['videos']):,}", inline=True)
-                            embed.set_footer(text=f"Channel ID: {stats['id']} • Prime Live Data")
+                            embed.set_footer(text=f"Channel ID: {stats['id']} • Lumora Live Data")
                             
                             await message.channel.send(embed=embed)
                             return
@@ -4472,7 +4474,7 @@ async def on_message(message):
                         description=f"Generated results for **{lang.upper()}**.",
                         color=0x00FFB4
                     )
-                    embed.set_footer(text="Prime | Technical Export")
+                    embed.set_footer(text="Lumora | Technical Export")
                     
                     await message.channel.send(embed=embed, file=discord.File(temp_path, filename=f"logic_{os.urandom(2).hex()}.{ext}"))
                     
@@ -4507,7 +4509,7 @@ async def help_command(ctx):
     logger.info(f'User {ctx.author.name} (ID: {ctx.author.id}) invoked help command')
 
     embed = discord.Embed(
-        title="✨ PRIME COMMANDS",
+        title="✨ LUMORA COMMANDS",
         description="The complete toolkit for top-tier creators and digital talent.",
         color=0x00FFB4
     )
@@ -4627,7 +4629,7 @@ async def level_command(ctx, member: discord.Member = None):
     if member.display_avatar:
         embed.set_thumbnail(url=member.display_avatar.url)
     
-    embed.set_footer(text="Prime Collective | Intelligence Sync Complete")
+    embed.set_footer(text="Lumora Collective | Intelligence Sync Complete")
     await ctx.send(embed=embed)
 
 @bot.hybrid_command(name="leaderboard", aliases=["top", "lb"])
@@ -5066,7 +5068,7 @@ async def hi_command(ctx):
     Usage: !hi
     """
     logger.info(f'User {ctx.author.name} (ID: {ctx.author.id}) invoked !hi command in {ctx.guild.name if ctx.guild else "DM"}')
-    await ctx.reply("👋 **Prime AI is Online!** I am hearing you loud and clear. If the AI doesn't respond to your regular messages, check if I have the correct API keys or permissions!")
+    await ctx.reply("👋 **Lumora AI is Online!** I am hearing you loud and clear. If the AI doesn't respond to your regular messages, check if I have the correct API keys or permissions!")
 
     try:
         # Send DM to the user
@@ -5264,11 +5266,11 @@ async def define_command(ctx, *, word=None):
         for chunk in chunks:
             await ctx.send(chunk)
 
-@bot.command(name="prime", aliases=["helper"])
-async def prime_command(ctx, *, query=None):
-    """All-in-one AI command for multi-purpose assistance. Usage: !prime anything you need help with"""
+@bot.command(name="lumora", aliases=["helper"])
+async def lumora_command(ctx, *, query=None):
+    """All-in-one AI command for multi-purpose assistance. Usage: !lumora anything you need help with"""
     if not query:
-        await ctx.send("🤖 Please provide a request! Usage: !prime [your question/request]")
+        await ctx.send("🤖 Please provide a request! Usage: !lumora [your question/request]")
         return
     async with ctx.typing():
         prompt = f"Help with this request in the most useful way possible: {query}"
@@ -5383,10 +5385,10 @@ async def slash_ping(interaction: discord.Interaction):
     """Slash command version of ping"""
     await interaction.response.send_message(f"🏓 Pong! Latency: **{round(bot.latency * 1000)}ms**")
 
-@bot.tree.command(name="prime", description="Ask Prime AI anything")
-@app_commands.describe(query="What do you want to ask Prime?")
-async def slash_prime(interaction: discord.Interaction, query: str):
-    """Slash command version of !prime"""
+@bot.tree.command(name="lumora", description="Ask Lumora AI anything")
+@app_commands.describe(query="What do you want to ask Lumora?")
+async def slash_lumora(interaction: discord.Interaction, query: str):
+    """Slash command version of !lumora"""
     await interaction.response.defer()
     try:
         prompt = f"Help with this request in the most useful way possible: {query}"
@@ -5404,21 +5406,21 @@ async def slash_prime(interaction: discord.Interaction, query: str):
 async def slash_help(interaction: discord.Interaction):
     """Slash command version of !help"""
     embed = discord.Embed(
-        title="🤖 PRIME BOT - COMMANDS",
+        title="🤖 LUMORA BOT - COMMANDS",
         description="I've sent the command list to your DMs!",
         color=0x3498DB
     )
     await interaction.response.send_message(embed=embed, ephemeral=True)
     
     embed_dm = discord.Embed(
-        title="🤖 PRIME BOT - COMMANDS",
+        title="🤖 LUMORA BOT - COMMANDS",
         description="Here is the list of available commands you can use!",
         color=0x3498DB
     )
-    embed_dm.add_field(name="🚀 Slash Commands", value="`/ping`, `/prime`, `/level`, `/leaderboard`, `/help`, `/commands`", inline=False)
+    embed_dm.add_field(name="🚀 Slash Commands", value="`/ping`, `/lumora`, `/level`, `/leaderboard`, `/help`, `/commands`", inline=False)
     embed_dm.add_field(name="📋 Prefix Commands (!)", value="`!help`, `!commands`, `!files`, `!presets`, `!level`, `!leaderboard`", inline=False)
-    embed_dm.add_field(name="📝 AI Tools", value="`!prime`, `!ask`, `!explain`, `!improve`... (see full list in !help)", inline=False)
-    embed_dm.set_footer(text="Prime AI • Developed by BMR")
+    embed_dm.add_field(name="📝 AI Tools", value="`!lumora`, `!ask`, `!explain`, `!improve`... (see full list in !help)", inline=False)
+    embed_dm.set_footer(text="Lumora AI • Developed by BMR")
     
     try:
         await interaction.user.send(embed=embed_dm)
@@ -5465,7 +5467,7 @@ async def file_command_handler(message):
     if first_word in ["help", "hi", "files", "software_list", "presets", 
                       "aecrack", "pscrack", "mecrack", "prcrack", "topazcrack", 
                       "ban", "mute", "timeout", "unmute", "setup_roles", "setup_verification", "appeal", "verify",
-                      "ask", "explain", "improve", "rewrite", "summarize", "analyze", "idea", "define", "prime", "helper",
+                      "ask", "explain", "improve", "rewrite", "summarize", "analyze", "idea", "define", "lumora", "helper",
                       "fix", "shorten", "expand", "caption", "script", "format", "title", "translate", "paragraph",
                       "remind", "note", "timer", "convert", "emoji", "calculate", "weather", "profile", "serverinfo",
                       "creative", "story", "quote", "brainstorm", "design", "name", "aesthetic", "topics", "motivate",
@@ -6100,7 +6102,7 @@ async def weather_command(ctx, *, location: str = None):
 
 @bot.command(name="profile", aliases=["p"])
 async def profile_command(ctx, member: discord.Member = None):
-    """Show the user's Prime Portfolio or Profile."""
+    """Show the user's Lumora Portfolio or Profile."""
     member = member or ctx.author
     
     # Logic: If author hasn't set their link, ask for it interactively
@@ -6138,7 +6140,7 @@ async def profile_command(ctx, member: discord.Member = None):
             file = discord.File(image_bytes, filename=f"portfolio_{member.id}.png")
             
             embed = discord.Embed(
-                title=f"💎 PRIME PORTFOLIO | {member.display_name}", 
+                title=f"💎 LUMORA PORTFOLIO | {member.display_name}", 
                 description=f"View {member.mention}'s professional editing profile.",
                 color=0x00FFB4
             )
@@ -6149,7 +6151,7 @@ async def profile_command(ctx, member: discord.Member = None):
             else:
                 embed.add_field(name="🔗 WORK", value="*Not yet linked*")
                 
-            embed.set_footer(text="Prime Leveling • Exclusive Edition", icon_url=bot.user.display_avatar.url)
+            embed.set_footer(text="Lumora Leveling • Exclusive Edition", icon_url=bot.user.display_avatar.url)
             
             await ctx.send(file=file, embed=embed)
         except Exception as e:
@@ -6210,37 +6212,37 @@ async def serverinfo_command(ctx):
 
 @bot.command(name="invite")
 async def invite_command(ctx):
-    """Get the official invite link for PRIME"""
+    """Get the official invite link for LUMORA"""
     invite_url = f"https://discord.com/oauth2/authorize?client_id={bot.user.id}&permissions=8&scope=bot"
     
     embed = discord.Embed(
-        title="🚀 ADD PRIME TO YOUR SERVER",
+        title="🚀 ADD LUMORA TO YOUR SERVER",
         description=(
             "Bring the ultimate AI power to your community.\n\n"
-            f"**[Click Here to Invite PRIME]({invite_url})**\n\n"
-            "**Official Website:** [prime.helperbot.fun](https://prime.helperbot.fun)"
+            f"**[Click Here to Invite LUMORA]({invite_url})**\n\n"
+            "**Official Website:** [prime.helperbot.fun](https://lumora.helperbot.fun)"
         ),
         color=0x00FFB4
     )
-    embed.set_footer(text="Prime Collective | Powered by BMR")
+    embed.set_footer(text="Lumora Collective | Powered by BMR")
     embed.set_thumbnail(url=bot.user.display_avatar.url)
     
     await ctx.send(embed=embed)
 
 @bot.command(name="vote")
 async def vote_command(ctx):
-    """Vote for PRIME on bot lists and support growth!"""
+    """Vote for LUMORA on bot lists and support growth!"""
     embed = discord.Embed(
-        title="💎 SUPPORT PRIME GROWTH",
+        title="💎 SUPPORT LUMORA GROWTH",
         description=(
-            "Voting helps PRIME reach more creators and communities.\n\n"
+            "Voting helps LUMORA reach more creators and communities.\n\n"
             "🗳️ **[Vote on Top.gg](https://top.gg/bot/1466029119275012139/vote)**\n"
             "🗳️ **[Vote on DiscordBotList.com](https://discordbotlist.com/bots/1466029119275012139/vote)**\n\n"
             "*Your support keeps the updates rolling. Thank you!*"
         ),
         color=0x00FFB4
     )
-    embed.set_footer(text="Prime Collective | Powered by BMR")
+    embed.set_footer(text="Lumora Collective | Powered by BMR")
     embed.set_thumbnail(url=bot.user.display_avatar.url)
     
     await ctx.send(embed=embed)
@@ -6352,14 +6354,14 @@ async def get_asset(ctx, category=None, *, query=None):
     """Smart Asset Finder for editors. Usage: !get [sfx/overlay/font/stock] [description]"""
     if not category or not query:
         embed = discord.Embed(
-            title="🔍 PRIME ASSET FINDER",
+            title="🔍 LUMORA ASSET FINDER",
             description="Find high-quality assets for your edits instantly!",
             color=0x00FFB4
         )
         embed.add_field(name="🚀 Usage", value="`!get [category] [description]`")
         embed.add_field(name="📁 Categories", value="`sfx`, `overlay`, `font`, `stock`, `pfp`, `banner`")
         embed.add_field(name="💡 Example", value="`!get sfx cinematic impact` or `!get font futuristic cyberpunk`", inline=False)
-        embed.set_footer(text="Prime creative tools • Developed by BMR")
+        embed.set_footer(text="Lumora creative tools • Developed by BMR")
         await ctx.send(embed=embed)
         return
 
@@ -6486,7 +6488,7 @@ async def sync_beat_map(ctx):
                 color=0x00FFB4,
                 timestamp=datetime.now(timezone.utc)
             )
-            embed.set_footer(text="Prime | Beat Mapping")
+            embed.set_footer(text="Lumora | Beat Mapping")
             await ctx.send(embed=embed)
             
         except Exception as e:
@@ -6520,7 +6522,7 @@ async def style_helper(ctx, *, description: str = None):
                 description=f"**Style Target:** `{description}`\n\n{response[:3800]}",
                 color=0x00FFB4
             )
-            embed.set_footer(text="Prime | Creative Stack")
+            embed.set_footer(text="Lumora | Creative Stack")
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(BOT_ERROR_MSG)
@@ -6556,13 +6558,13 @@ async def server_stats_command(ctx):
                 color=0x00FFB4,
                 timestamp=datetime.now(timezone.utc)
             )
-            embed.set_footer(text="Prime | Server Analysis")
+            embed.set_footer(text="Lumora | Server Analysis")
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(BOT_ERROR_MSG)
 
 @bot.command(name="pulse")
-async def prime_pulse(ctx):
+async def lumora_pulse(ctx):
     """Summarize recent server activity and vibes."""
     async with ctx.typing():
         try:
@@ -6594,7 +6596,7 @@ async def prime_pulse(ctx):
                 color=0x00FFB4,
                 timestamp=datetime.now(timezone.utc)
             )
-            embed.set_footer(text="Prime | Chat Recap")
+            embed.set_footer(text="Lumora | Chat Recap")
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(BOT_ERROR_MSG)
@@ -6602,12 +6604,12 @@ async def prime_pulse(ctx):
 @bot.command(name="think")
 async def think_command(ctx, *, query: str):
     """Thinking Mode: Use advanced reasoning for complex problems."""
-    msg = await ctx.send("🧠 **PRIME THOUGHT ENGINE**\n*Analyzing context and mapping logical vectors...*")
+    msg = await ctx.send("🧠 **LUMORA THOUGHT ENGINE**\n*Analyzing context and mapping logical vectors...*")
     async with ctx.typing():
         try:
             # We add a bit of drama
             await asyncio.sleep(1.5)
-            await msg.edit(content="🧠 **PRIME THOUGHT ENGINE**\n*Simulating outcomes and identifying optimal paths...*")
+            await msg.edit(content="🧠 **LUMORA THOUGHT ENGINE**\n*Simulating outcomes and identifying optimal paths...*")
             
             response = await get_gemini_response(query, ctx.author.id, username=ctx.author.name, use_thought=True, guild_id=ctx.guild.id if ctx.guild else None)
             
@@ -6642,7 +6644,7 @@ async def executive_briefing(ctx):
                 color=0x00FFB4,
                 timestamp=datetime.now(timezone.utc)
             )
-            embed.set_footer(text="Prime | Executive Intel")
+            embed.set_footer(text="Lumora | Executive Intel")
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(BOT_ERROR_MSG)
@@ -6656,7 +6658,7 @@ async def aesthetic_overlay_command(ctx, aesthetic: str = None):
     if not aesthetic:
         embed = discord.Embed(
             title="🎭 AESTHETIC OVERLAYS",
-            description="Transform Prime's personality for this server.",
+            description="Transform Lumora's personality for this server.",
             color=0x00FFB4
         )
         embed.add_field(name="Available Styles", value="`cyberpunk`, `minimalist`, `chaos`, `lofi`, `aggressive`, `professional`")
@@ -6671,10 +6673,10 @@ async def aesthetic_overlay_command(ctx, aesthetic: str = None):
 
     if aesthetic.lower() == 'reset':
         db_manager.save_guild_setting(ctx.guild.id, "aesthetic_overlay", None)
-        await ctx.send("🌌 **System Reset**: Prime has returned to standard personality.")
+        await ctx.send("🌌 **System Reset**: Lumora has returned to standard personality.")
     else:
         db_manager.save_guild_setting(ctx.guild.id, "aesthetic_overlay", aesthetic.lower())
-        await ctx.send(f"🎭 **Overlay Applied**: Prime is now in **{aesthetic.upper()}** mode for this server.")
+        await ctx.send(f"🎭 **Overlay Applied**: Lumora is now in **{aesthetic.upper()}** mode for this server.")
 
 @bot.command(name="setup_updates")
 async def setup_updates(ctx, channel: discord.TextChannel = None):
@@ -6730,7 +6732,7 @@ async def broadcast_update(ctx, *, message: str):
         color=0x00FFB4,
         timestamp=datetime.now(timezone.utc)
     )
-    embed.set_footer(text="Prime Collective | Technical Intelligence")
+    embed.set_footer(text="Lumora Collective | Technical Intelligence")
     
     for guild in bot.guilds:
         channel_id = db_manager.get_guild_setting(guild.id, "update_channel_id")
@@ -6757,7 +6759,7 @@ async def strategize_command(ctx, *, query: str):
                 color=0x00FFB4,
                 timestamp=datetime.now(timezone.utc)
             )
-            embed.set_footer(text="Prime | Decision Architect")
+            embed.set_footer(text="Lumora | Decision Architect")
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(BOT_ERROR_MSG)
@@ -6793,7 +6795,7 @@ async def show_aura(ctx, member: discord.Member = None):
             timestamp=datetime.now(timezone.utc)
         )
         embed.set_thumbnail(url=member.display_avatar.url if member.display_avatar else None)
-        embed.set_footer(text="Prime | Identity Analysis")
+        embed.set_footer(text="Lumora | Identity Analysis")
         await ctx.send(embed=embed)
 
 @bot.command(name="clout")
@@ -6835,7 +6837,7 @@ async def clout_analysis(ctx):
                 color=0x00FFB4,
                 timestamp=datetime.now(timezone.utc)
             )
-            embed.set_footer(text="Prime | Engagement Analysis")
+            embed.set_footer(text="Lumora | Engagement Analysis")
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(BOT_ERROR_MSG)
@@ -6853,7 +6855,7 @@ async def mimic_mode(ctx, target: discord.Member, *, prompt: str = "Hello everyo
                 if len(history) >= 20: break
             
             if not history:
-                await ctx.send(f"❌ **Prime Gap**: Not enough data to mimic {target.display_name}.")
+                await ctx.send(f"❌ **Lumora Gap**: Not enough data to mimic {target.display_name}.")
                 return
 
             vibe_data = "\n".join(history)
@@ -6889,7 +6891,7 @@ async def identity_report(ctx, member: discord.Member = None):
         
         # Report as file
         with tempfile.NamedTemporaryFile(suffix=".txt", delete=False, mode='w', encoding='utf-8') as tf:
-            tf.write(f"PRIME IDENTITY REPORT\n{'='*30}\nSUBJECT: {member.name}\nDesignation: {user_memory.get('vibe', 'Unknown').upper()}\n\n{bio}")
+            tf.write(f"LUMORA IDENTITY REPORT\n{'='*30}\nSUBJECT: {member.name}\nDesignation: {user_memory.get('vibe', 'Unknown').upper()}\n\n{bio}")
             temp_path = tf.name
             
         embed = discord.Embed(
@@ -6897,7 +6899,7 @@ async def identity_report(ctx, member: discord.Member = None):
             description=f"Generated a professional bio for **{member.name}**.",
             color=0x00FFB4
         )
-        embed.set_footer(text="Prime | Bio Export")
+        embed.set_footer(text="Lumora | Bio Export")
         await ctx.send(embed=embed, file=discord.File(temp_path, filename=f"bio_{member.name.lower()}.txt"))
         
         try: os.remove(temp_path)
@@ -6923,7 +6925,7 @@ async def chat_snipe(ctx):
             color=0xFF0055,
             timestamp=msg['time']
         )
-        embed.set_footer(text="Prime | Sniper")
+        embed.set_footer(text="Lumora | Sniper")
         await ctx.send(embed=embed)
 
 @bot.command(name="duel")
@@ -6939,14 +6941,14 @@ async def creative_duel(ctx, opponent: discord.Member):
         
         embed = discord.Embed(
             title="⚔️ CREATIVE DUEL",
-            description=f"**Competitors:** {ctx.author.mention} vs {opponent.mention}\n\n**The Challenge:**\n{duel_prompt}\n\n*Response phase active. Prime will judge your answers.*",
+            description=f"**Competitors:** {ctx.author.mention} vs {opponent.mention}\n\n**The Challenge:**\n{duel_prompt}\n\n*Response phase active. Lumora will judge your answers.*",
             color=0xFFAA00
         )
-        embed.set_footer(text="Prime | Duel")
+        embed.set_footer(text="Lumora | Duel")
         await ctx.send(embed=embed)
 
 @bot.command(name="match")
-async def prime_match(ctx):
+async def lumora_match(ctx):
     """Find a user with a similar vibe for collaboration."""
     async with ctx.typing():
         current_memory = db_manager.get_user_memory(ctx.author.id)
@@ -6966,7 +6968,7 @@ async def prime_match(ctx):
             description=f"**Your Vibe:** `{my_vibe.upper()}`\n\n**Suggestion:**\n{advice}",
             color=0x00FFB4
         )
-        embed.set_footer(text="Prime | Matchmaker")
+        embed.set_footer(text="Lumora | Matchmaker")
         await ctx.send(embed=embed)
 
 @bot.command(name="vision")
@@ -6990,7 +6992,7 @@ async def technical_vision(ctx):
             1. **Lighting Analysis**: Source, quality (soft/hard), and temperature.
             2. **Color Profile**: Dominant hues and psychological impact.
             3. **Composition**: Rule of thirds, leading lines, and depth.
-            4. **Editing Suggestion**: One tuff way to grade this for a 'PRIME' look.
+            4. **Editing Suggestion**: One tuff way to grade this for a 'LUMORA' look.
             
             Be extremely technical and professional.
             """
@@ -7002,7 +7004,7 @@ async def technical_vision(ctx):
                 color=0x00FFB4,
                 timestamp=datetime.now(timezone.utc)
             )
-            embed.set_footer(text="Prime | Vision")
+            embed.set_footer(text="Lumora | Vision")
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(BOT_ERROR_MSG)
@@ -7026,7 +7028,7 @@ async def color_palette_extraction(ctx):
                 description=f"**Extracted Palette:**\n\n{response}",
                 color=0x00FFB4
             )
-            embed.set_footer(text="Prime | Palette Extraction")
+            embed.set_footer(text="Lumora | Palette Extraction")
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(BOT_ERROR_MSG)
@@ -7041,7 +7043,7 @@ async def project_structure_Report(ctx, *, type: str = "Video Edit"):
             
             # Report as file for the "tuff" factor
             with tempfile.NamedTemporaryFile(suffix=".txt", delete=False, mode='w', encoding='utf-8') as tf:
-                tf.write(f"PRIME PROJECT STRUCTURE\n{'='*40}\nTYPE: {type.upper()}\n\n{response}")
+                tf.write(f"LUMORA PROJECT STRUCTURE\n{'='*40}\nTYPE: {type.upper()}\n\n{response}")
                 temp_path = tf.name
                 
             embed = discord.Embed(
@@ -7049,7 +7051,7 @@ async def project_structure_Report(ctx, *, type: str = "Video Edit"):
                 description=f"Generated a professional structure for **{type}**.",
                 color=0x00FFB4
             )
-            embed.set_footer(text="Prime | Organization")
+            embed.set_footer(text="Lumora | Organization")
             await ctx.send(embed=embed, file=discord.File(temp_path, filename=f"structure_{type.lower().replace(' ', '_')}.txt"))
             
             try: os.remove(temp_path)
@@ -7079,7 +7081,7 @@ async def technical_blueprint(ctx, *, query: str = None):
             
             # Use Report logic
             with tempfile.NamedTemporaryFile(suffix=".txt", delete=False, mode='w', encoding='utf-8') as tf:
-                tf.write(f"PRIME EXPRESSION GUIDE\n{'='*40}\nQUERY: {query.upper()}\n\n{response}")
+                tf.write(f"LUMORA EXPRESSION GUIDE\n{'='*40}\nQUERY: {query.upper()}\n\n{response}")
                 temp_path = tf.name
  
             embed = discord.Embed(
@@ -7087,7 +7089,7 @@ async def technical_blueprint(ctx, *, query: str = None):
                 description=f"Generated a setup guide for: `{query}`\n\n*(Full guide attached as file)*",
                 color=0x00FFB4
             )
-            embed.set_footer(text="Prime | Logic & Technical")
+            embed.set_footer(text="Lumora | Logic & Technical")
             await ctx.send(embed=embed, file=discord.File(temp_path, filename=f"guide_{os.urandom(2).hex()}.txt"))
             
             try: os.remove(temp_path)
@@ -7131,7 +7133,7 @@ async def talent_scout(ctx, member: discord.Member = None):
                 color=0x00FFB4,
                 timestamp=datetime.now(timezone.utc)
             )
-            embed.set_footer(text="Prime | Talent Analysis")
+            embed.set_footer(text="Lumora | Talent Analysis")
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(BOT_ERROR_MSG)
@@ -7164,7 +7166,7 @@ async def spectral_phantom(ctx):
                 color=0x6600FF,
                 timestamp=datetime.now(timezone.utc)
             )
-            embed.set_footer(text="Prime | Channel Analysis")
+            embed.set_footer(text="Lumora | Channel Analysis")
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(BOT_ERROR_MSG)
@@ -7173,7 +7175,7 @@ async def spectral_phantom(ctx):
 async def text_glitch(ctx, *, text: str = None):
     """Generate a stylized version of text."""
     if not text:
-        await ctx.send("❌ **Error**: Provide text to glitch (e.g., '!glitch PRIME').")
+        await ctx.send("❌ **Error**: Provide text to glitch (e.g., '!glitch LUMORA').")
         return
     
     async with ctx.typing():
@@ -7204,7 +7206,7 @@ async def aesthetic_uplift(ctx):
                 color=0x00FFB4,
                 timestamp=datetime.now(timezone.utc)
             )
-            embed.set_footer(text="Prime | Quality Control")
+            embed.set_footer(text="Lumora | Quality Control")
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(BOT_ERROR_MSG)
@@ -7226,7 +7228,7 @@ async def expression_sandbox(ctx, *, expression: str = None):
                 description=response[:4000],
                 color=0x00FFB4
             )
-            embed.set_footer(text="Prime | AE Sandbox")
+            embed.set_footer(text="Lumora | AE Sandbox")
             await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send(BOT_ERROR_MSG)
@@ -7240,7 +7242,7 @@ async def secret_override(ctx):
         return
     
     embed = discord.Embed(
-        title="🕵️ PRIME OVERRIDE: DEVELOPER TOOLS",
+        title="🕵️ LUMORA OVERRIDE: DEVELOPER TOOLS",
         description="Management interface for BMR.",
         color=0xFF0000
     )
@@ -7248,7 +7250,7 @@ async def secret_override(ctx):
     embed.add_field(name="🔒 System Control", value="`!debug_memory`: View raw user memory\n`!purge_cache`: Clear temporary buffers\n`!force_rotate`: Manually cycle API keys\n`!server_scan`: Security check", inline=False)
     embed.add_field(name="🧬 Profile Tuning", value="`!tweak_vibe @user [vibe]`: Force-update user's vibe\n`!wipe_history @user`: Purge user's history", inline=False)
     
-    embed.set_footer(text="DEVELOPER ACCESS • PRIME")
+    embed.set_footer(text="DEVELOPER ACCESS • LUMORA")
     await ctx.author.send(embed=embed)
     await ctx.send("🛡️ **Override Active**: Check your DMs, BMR.", delete_after=5)
 
@@ -7278,7 +7280,7 @@ async def set_rules_command(ctx):
                 "all members are required to adhere to the following protocols. Failure to comply "
                 "may result in administrative action."
             ),
-            color=0x00FFB4, # Prime Green
+            color=0x00FFB4, # Lumora Green
             timestamp=datetime.now(timezone.utc)
         )
 
@@ -7331,7 +7333,7 @@ async def set_rules_command(ctx):
             inline=False
         )
 
-        footer_text = "PRIME | THIS SERVER IS PROTECTED BY AI"
+        footer_text = "LUMORA | THIS SERVER IS PROTECTED BY AI"
         if ctx.guild and ctx.guild.icon:
             embed.set_footer(text=footer_text, icon_url=ctx.guild.icon.url)
         else:
@@ -7358,7 +7360,7 @@ async def editing_softwares_command(ctx):
     embed = discord.Embed(
         title="🎬 CREATIVE SOFTWARE HUB",
         description=(
-            "Welcome to the **Prime Software Hub**. Here are all the essential versions for your creative setup.\n\n"
+            "Welcome to the **Lumora Software Hub**. Here are all the essential versions for your creative setup.\n\n"
             "**Available Software:**\n"
             "• `!ae` - After Effects\n"
             "• `!pr` - Premiere Pro\n"
@@ -7376,7 +7378,7 @@ async def editing_softwares_command(ctx):
         color=0x00FFB4,
         timestamp=datetime.now(timezone.utc)
     )
-    embed.set_footer(text="Prime | Software Hub")
+    embed.set_footer(text="Lumora | Software Hub")
     if ctx.guild and ctx.guild.icon:
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon.url)
     
@@ -7404,7 +7406,7 @@ async def ae_versions_command(ctx):
     for version, link in versions.items():
         embed.add_field(name=version, value=f"🔗 [Download]({link})", inline=True)
     
-    embed.set_footer(text="Prime | VFX Suite")
+    embed.set_footer(text="Lumora | VFX Suite")
     await ctx.send(embed=embed)
 
 @bot.command(name="pr")
@@ -7426,7 +7428,7 @@ async def pr_versions_command(ctx):
     for version, link in versions.items():
         embed.add_field(name=version, value=f"🔗 [Download]({link})", inline=True)
     
-    embed.set_footer(text="Prime | Edit Suite")
+    embed.set_footer(text="Lumora | Edit Suite")
     await ctx.send(embed=embed)
 
 @bot.command(name="me")
@@ -7451,7 +7453,7 @@ async def me_versions_command(ctx):
     for version, link in versions.items():
         embed.add_field(name=version, value=f"🔗 [Download]({link})", inline=True)
     
-    embed.set_footer(text="Prime | Render Suite")
+    embed.set_footer(text="Lumora | Render Suite")
     await ctx.send(embed=embed)
 
 @bot.command(name="ps")
@@ -7473,7 +7475,7 @@ async def ps_versions_command(ctx):
     for version, link in versions.items():
         embed.add_field(name=version, value=f"🔗 [Download]({link})", inline=True)
     
-    embed.set_footer(text="Prime | Design Suite")
+    embed.set_footer(text="Lumora | Design Suite")
     await ctx.send(embed=embed)
 
 @bot.command(name="topaz")
@@ -7495,7 +7497,7 @@ async def topaz_versions_command(ctx):
     for version, link in versions.items():
         embed.add_field(name=version, value=f"🔗 [Download]({link})", inline=True)
     
-    embed.set_footer(text="Prime | AI Suite")
+    embed.set_footer(text="Lumora | AI Suite")
     await ctx.send(embed=embed)
 
 @bot.command(name="animate")
@@ -7512,7 +7514,7 @@ async def animate_command(ctx):
     )
     for name, link in versions.items():
         embed.add_field(name=name, value=f"🔗 [Download]({link})", inline=True)
-    embed.set_footer(text="Prime | Animation Setup")
+    embed.set_footer(text="Lumora | Animation Setup")
     await ctx.send(embed=embed)
 
 @bot.command(name="illustrator")
@@ -7529,7 +7531,7 @@ async def illustrator_command(ctx):
     )
     for name, link in versions.items():
         embed.add_field(name=name, value=f"🔗 [Download]({link})", inline=True)
-    embed.set_footer(text="Prime | Design Setup")
+    embed.set_footer(text="Lumora | Design Setup")
     await ctx.send(embed=embed)
 
 @bot.command(name="indesign")
@@ -7546,7 +7548,7 @@ async def indesign_command(ctx):
     )
     for name, link in versions.items():
         embed.add_field(name=name, value=f"🔗 [Download]({link})", inline=True)
-    embed.set_footer(text="Prime | Layout Setup")
+    embed.set_footer(text="Lumora | Layout Setup")
     await ctx.send(embed=embed)
 
 @bot.command(name="lightroom")
@@ -7563,7 +7565,7 @@ async def lightroom_command(ctx):
     )
     for name, link in versions.items():
         embed.add_field(name=name, value=f"🔗 [Download]({link})", inline=True)
-    embed.set_footer(text="Prime | Photo Setup")
+    embed.set_footer(text="Lumora | Photo Setup")
     await ctx.send(embed=embed)
 
 @bot.command(name="audition")
@@ -7580,7 +7582,7 @@ async def audition_command(ctx):
     )
     for name, link in versions.items():
         embed.add_field(name=name, value=f"🔗 [Download]({link})", inline=True)
-    embed.set_footer(text="Prime | Audio Setup")
+    embed.set_footer(text="Lumora | Audio Setup")
     await ctx.send(embed=embed)
 
 @bot.command(name="incopy")
@@ -7597,7 +7599,7 @@ async def incopy_command(ctx):
     )
     for name, link in versions.items():
         embed.add_field(name=name, value=f"🔗 [Download]({link})", inline=True)
-    embed.set_footer(text="Prime | Writing Setup")
+    embed.set_footer(text="Lumora | Writing Setup")
     await ctx.send(embed=embed)
 
 @bot.command(name="plugins")
@@ -7606,7 +7608,7 @@ async def plugins_command(ctx):
     embed = discord.Embed(
         title="🔌 PLUGIN HUB",
         description=(
-            "Welcome to the **Prime Plugin Hub**. Get all the essential tools to supercharge your workflow.\n\n"
+            "Welcome to the **Lumora Plugin Hub**. Get all the essential tools to supercharge your workflow.\n\n"
             "**Vendor Commands:**\n"
             "• `!borisfx` - Continuum, Sapphire, Mocha\n"
             "• `!maxon` - Red Giant Suite & Universe\n"
@@ -7623,7 +7625,7 @@ async def plugins_command(ctx):
         color=0xFF0055,
         timestamp=datetime.now(timezone.utc)
     )
-    embed.set_footer(text="Prime | Plugin Hub")
+    embed.set_footer(text="Lumora | Plugin Hub")
     await ctx.send(embed=embed)
 
 @bot.command(name="borisfx")
@@ -7824,7 +7826,7 @@ async def extensions_command(ctx):
     for name, link in items.items():
         embed.add_field(name=name, value=f"🔗 [Download]({link})", inline=True)
     
-    embed.set_footer(text="Prime | Extensions")
+    embed.set_footer(text="Lumora | Extensions")
     await ctx.send(embed=embed)
 
 @bot.command(name="access")
@@ -7847,7 +7849,7 @@ async def access_instructions_command(ctx):
         color=0x00FFB4,
         timestamp=datetime.now(timezone.utc)
     )
-    embed.set_footer(text="Prime | Access Hub")
+    embed.set_footer(text="Lumora | Access Hub")
     
     # Send the embed
     msg = await ctx.send(embed=embed)
@@ -7882,7 +7884,7 @@ async def set_chat_channel_cmd(ctx, channel: discord.TextChannel = None):
     """Set the channel where AI will proactively respond to all messages."""
     channel = channel or ctx.channel
     db_manager.save_guild_setting(ctx.guild.id, "chat_channel", channel.id)
-    await ctx.reply(f"?? **Prime AI**: I will now proactively respond to all messages in {channel.mention}.\n*Note: Use mentions elsewhere or repeat this command in another channel to switch.*")
+    await ctx.reply(f"?? **Lumora AI**: I will now proactively respond to all messages in {channel.mention}.\n*Note: Use mentions elsewhere or repeat this command in another channel to switch.*")
 
 def run_bot():
     """Function to start the bot with the token from environment variables."""
